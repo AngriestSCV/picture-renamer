@@ -194,9 +194,10 @@ Window {
                                 var baseName = rawText.substring(0, rawText.lastIndexOf('.'));
 
                                 renameTextField.forceActiveFocus();
-                                //renameTextField.select(0, baseName.Length);
-                                //renameTextField.cursorPosition = baseName.Length;
-                                renameTextField.selectAll();
+                                renameTextField.select(0, baseName.Length);
+                                renameTextField.cursorPosition = baseName.Length;
+                                //renameTextField.forceActiveFocus();
+                                //renameTextField.selectAll();
                             }
                         }
                     }
