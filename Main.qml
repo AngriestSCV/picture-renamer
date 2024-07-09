@@ -3,20 +3,17 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import local.DirectoryView
 
+import "Constants.js" as Constants
+import "Utils.js" as Utils
+
 Window {
     width: 640
     height: 480
     visible: true
     title: qsTr("Picture Renamer")
 
-    function stripPrefix(prefix, target) {
-        if(target.startsWith(prefix)){
-            target = oldPath.substring(prefix.length);
-        }
-        return target;
-    }
-
     ColumnLayout {
+
         anchors.fill: parent
         Row{
             Layout.fillWidth: true
@@ -141,20 +138,30 @@ Window {
                         // if(!sel.hasSelection)
                         //     return;
 
-                        var cur = sel.currentIndex;
+                        let cur = sel.currentIndex;
                         if(cur < 0)
                             return;
 
                         if(!fileSystemModel.data(cur, DirectoryView.IsImage))
                             return;
 
-                        var url = fileSystemModel.data(cur, DirectoryView.UrlStringRole)
+                        let url = fileSystemModel.data(cur, DirectoryView.UrlStringRole)
 
                         var newName = promptRename(url)
                         if (newName)
                             renameFile(currentFilePath, newName)
-                    } else if (event.key == Qt.Key_Delete){
-                        fileHandler.deleteFile()
+                    } else if (event.key === Qt.Key_Delete) {
+                        let cur = sel.currentIndex;
+                        if(cur < 0)
+                            return;
+
+                        if(!fileSystemModel.data(cur, DirectoryView.IsImage))
+                            return;
+
+                        let url = fileSystemModel.data(cur, DirectoryView.UrlStringRole)
+
+                        url = Utils.stripPrefix(Constants.filePrefix, url);
+                        fileHandler.deleteFile(url);
                     }
                 }
 
@@ -167,7 +174,11 @@ Window {
                     onAccepted: renameFile(renameDialog.currentFilePath, renameTextField.text)
 
                     onOpened: (evt) =>{
-                        renameTextField.selectAll();
+                        var rawText = renameTextField.text;
+                        var baseName = rawText.substring(0, rawText.lastIndexOf('.'));
+
+                        renameTextField.select(0, baseName.Length);
+                        renameTextField.forceActiveFocus(); // Set focus programmatically
                     }
 
                     ColumnLayout {
@@ -178,14 +189,12 @@ Window {
                             id: renameTextField
                             Layout.fillWidth: true
                             selectByMouse: true
+
                         }
                     }
 
                     function renameFile(oldPath, newName) {
-                        var filePrefix = "file:///";
-                        if(oldPath.startsWith(filePrefix)){
-                            oldPath = oldPath.substring(filePrefix.length);
-                        }
+                        oldPath = Utils.stripPrefix(Constants.filePrefix, oldPath);
 
                         var newPath = oldPath.substring(0, oldPath.lastIndexOf('/') + 1) + newName
                         console.log("Renaming: " + oldPath + " to " + newPath)

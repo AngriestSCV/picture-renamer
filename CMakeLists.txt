@@ -23,6 +23,8 @@ qt_add_qml_module(apppicture-renamer
         SOURCES
         SOURCES directoryview.h directoryview.cpp
         SOURCES filehandler.h filehandler.cpp
+        QML_FILES Constants.js
+        QML_FILES Utils.js
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
