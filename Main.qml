@@ -42,7 +42,7 @@ Window {
             }
         }
 
-        RowLayout{
+        RowLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
@@ -172,14 +172,6 @@ Window {
                     title: "Rename File"
                     standardButtons: Dialog.Cancel | Dialog.Ok
                     onAccepted: renameFile(renameDialog.currentFilePath, renameTextField.text)
-
-                    onOpened: (evt) =>{
-                        // var rawText = renameTextField.text;
-                        // var baseName = rawText.substring(0, rawText.lastIndexOf('.'));
-
-                        // renameTextField.forceActiveFocus(); // Set focus programmatically
-                        // renameTextField.select(0, baseName.Length);
-                    }
 
                     ColumnLayout {
                         Label {
