@@ -174,11 +174,11 @@ Window {
                     onAccepted: renameFile(renameDialog.currentFilePath, renameTextField.text)
 
                     onOpened: (evt) =>{
-                        var rawText = renameTextField.text;
-                        var baseName = rawText.substring(0, rawText.lastIndexOf('.'));
+                        // var rawText = renameTextField.text;
+                        // var baseName = rawText.substring(0, rawText.lastIndexOf('.'));
 
-                        renameTextField.select(0, baseName.Length);
-                        renameTextField.forceActiveFocus(); // Set focus programmatically
+                        // renameTextField.forceActiveFocus(); // Set focus programmatically
+                        // renameTextField.select(0, baseName.Length);
                     }
 
                     ColumnLayout {
@@ -189,7 +189,23 @@ Window {
                             id: renameTextField
                             Layout.fillWidth: true
                             selectByMouse: true
+                            Keys.onReturnPressed: (evt) => {
+                                renameDialog.accept();
+                                renameDialog.close();
+                            }
+                            Keys.onEscapePressed: (evt) => {
+                                renameDialog.close();
+                            }
 
+                            Component.onCompleted: {
+                                var rawText = renameTextField.text;
+                                var baseName = rawText.substring(0, rawText.lastIndexOf('.'));
+
+                                //renameTextField.select(0, baseName.Length);
+                                renameTextField.selectAll();
+                                renameTextField.cursorPosition = baseName.Length;
+                                forceActiveFocus(); // Set focus programmatically
+                            }
                         }
                     }
 
