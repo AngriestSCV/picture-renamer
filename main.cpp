@@ -1,25 +1,13 @@
 #include <QFileSystemModel>
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
-#include <iostream>
 #include "QQmlContext"
 
-#include "filesystem"
 #include "directoryview.h"
 #include "filehandler.h"
 
 int main(int argc, char *argv[])
 {
-    auto aaa = std::filesystem::directory_iterator("C:\\src\\");
-
-    for(auto &a : aaa){
-        if(a.is_directory())
-            std::cout << "Dir: ";
-        else
-            std::cout << "Fil: ";
-        std::cout << a.path() << std::endl;
-    }
-
     QGuiApplication app(argc, argv);
 
     QQmlApplicationEngine engine;
