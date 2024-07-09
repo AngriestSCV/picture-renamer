@@ -28,7 +28,6 @@ Window {
             }
         }
 
-
         Row {
             Layout.fillWidth: true
             id: row
@@ -132,7 +131,8 @@ Window {
                          text: model.display
                      }
                 }
-                 // Detect F2 key press
+
+                // Detect F2 key press
                 Keys.onPressed: (event) => {
                     if (event.key === Qt.Key_F2) {
                         // if(!sel.hasSelection)
@@ -226,7 +226,6 @@ Window {
                     renameDialog.currentFilePath = filePath;
                     var result = renameDialog.open()
                 }
-
             }
 
             Image {
