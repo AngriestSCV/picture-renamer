@@ -201,10 +201,10 @@ Window {
                                 var rawText = renameTextField.text;
                                 var baseName = rawText.substring(0, rawText.lastIndexOf('.'));
 
+                                renameTextField.forceActiveFocus();
                                 //renameTextField.select(0, baseName.Length);
+                                //renameTextField.cursorPosition = baseName.Length;
                                 renameTextField.selectAll();
-                                renameTextField.cursorPosition = baseName.Length;
-                                forceActiveFocus(); // Set focus programmatically
                             }
                         }
                     }
@@ -214,7 +214,7 @@ Window {
 
                         var newPath = oldPath.substring(0, oldPath.lastIndexOf('/') + 1) + newName
                         console.log("Renaming: " + oldPath + " to " + newPath)
-                        fileHandler.renameFile(oldPath, newName);
+                        fileHandler.renameFile(oldPath, newPath);
                     }
 
                     property string currentFilePath: ""
