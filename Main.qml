@@ -9,60 +9,68 @@ Window {
     visible: true
     title: qsTr("Picture Renamer")
 
+    function stripPrefix(prefix, target) {
+        if(target.startsWith(prefix)){
+            target = oldPath.substring(prefix.length);
+        }
+        return target;
+    }
 
-    Row{
-        MenuBar {
-            Menu {
-                title: qsTr("File")
-                MenuItem {
-                    text: qsTr("Exit")
-                    onTriggered: Qt.quit();
+    ColumnLayout {
+        anchors.fill: parent
+        Row{
+            Layout.fillWidth: true
+            MenuBar {
+                Menu {
+                    title: qsTr("File")
+                    MenuItem {
+                        text: qsTr("Exit")
+                        onTriggered: Qt.quit();
+                    }
                 }
             }
         }
-    }
 
 
-    Row {
-        id: row
-        anchors.top: parent.top
-        anchors.topMargin: 12
-        anchors.horizontalCenter: parent.horizontalCenter
-
-           Repeater {
-            model: [ "None", "Single", "Extended", "Multi", "Contig."]
-            Button {
-                text: modelData
-                checkable: true
-                checked: index === 1
-                onClicked: view.selectionMode = index
+        Row {
+            Layout.fillWidth: true
+            id: row
+               Repeater {
+                model: [ "None", "Single", "Extended", "Multi", "Contig."]
+                Button {
+                    text: modelData
+                    checkable: true
+                    checked: index === 1
+                    onClicked: view.selectionMode = index
+                }
             }
         }
-    }
 
-    ItemSelectionModel {
-        id: sel
-        model: fileSystemModel
-        onCurrentChanged: (cur) => {
-            if(fileSystemModel.data(cur, DirectoryView.IsImage))
-            {
-                var url = fileSystemModel.data(cur, DirectoryView.UrlStringRole)
-                //Qt.openUrlExternally(url)
-                image.source = url;
+        RowLayout{
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            ItemSelectionModel {
+                id: sel
+                model: fileSystemModel
+                onCurrentChanged: (cur) => {
+                    if(fileSystemModel.data(cur, DirectoryView.IsImage))
+                    {
+                        var url = fileSystemModel.data(cur, DirectoryView.UrlStringRole)
+                        //Qt.openUrlExternally(url)
+                        image.source = url;
+                    }
+                }
             }
-        }
-    }
 
-
-    ColumnLayout{
-        Column {
             TreeView {
                 id: view
-                anchors.fill: parent
-                anchors.margins: 2 * 12 + row.height
                 model: fileSystemModel
                 rootIndex: rootPathIndex
                 selectionModel: sel
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Layout.preferredWidth: 300
 
                 delegate: Item {
                      implicitWidth: padding + label.x + label.implicitWidth + padding
@@ -127,15 +135,82 @@ Window {
                          text: model.display
                      }
                 }
-            }
-        }
+                 // Detect F2 key press
+                Keys.onPressed: (event) => {
+                    if (event.key === Qt.Key_F2) {
+                        // if(!sel.hasSelection)
+                        //     return;
 
-        Column {
-            Image {
-                id: image
-                height: parent.height
-                width: parent.width
+                        var cur = sel.currentIndex;
+                        if(cur < 0)
+                            return;
+
+                        if(!fileSystemModel.data(cur, DirectoryView.IsImage))
+                            return;
+
+                        var url = fileSystemModel.data(cur, DirectoryView.UrlStringRole)
+
+                        var newName = promptRename(url)
+                        if (newName)
+                            renameFile(currentFilePath, newName)
+                    } else if (event.key == Qt.Key_Delete){
+                        fileHandler.deleteFile()
+                    }
+                }
+
+
+                Dialog {
+                    id: renameDialog
+                    modal: true
+                    title: "Rename File"
+                    standardButtons: Dialog.Cancel | Dialog.Ok
+                    onAccepted: renameFile(renameDialog.currentFilePath, renameTextField.text)
+
+                    onOpened: (evt) =>{
+                        renameTextField.selectAll();
+                    }
+
+                    ColumnLayout {
+                        Label {
+                            text: "Enter new name:"
+                        }
+                        TextField {
+                            id: renameTextField
+                            Layout.fillWidth: true
+                            selectByMouse: true
+                        }
+                    }
+
+                    function renameFile(oldPath, newName) {
+                        var filePrefix = "file:///";
+                        if(oldPath.startsWith(filePrefix)){
+                            oldPath = oldPath.substring(filePrefix.length);
+                        }
+
+                        var newPath = oldPath.substring(0, oldPath.lastIndexOf('/') + 1) + newName
+                        console.log("Renaming: " + oldPath + " to " + newPath)
+                        fileHandler.renameFile(oldPath, newName);
+                    }
+
+                    property string currentFilePath: ""
+
+                }
+
+                function promptRename(filePath) {
+                    renameTextField.text = filePath.split('/').pop() // Set current file name
+                    renameDialog.currentFilePath = filePath;
+                    var result = renameDialog.open()
+                }
+
             }
+
+            Image {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                id: image
+                fillMode: Image.PreserveAspectFit
+            }
+
         }
     }
 }

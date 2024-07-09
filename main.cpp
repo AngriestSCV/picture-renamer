@@ -6,6 +6,7 @@
 
 #include "filesystem"
 #include "directoryview.h"
+#include "filehandler.h"
 
 int main(int argc, char *argv[])
 {
@@ -24,14 +25,15 @@ int main(int argc, char *argv[])
     QQmlApplicationEngine engine;
 
     QFileSystemModel *fsm = new DirectoryView(&engine);
+    FileHandler fileHandler;
+
     fsm->setRootPath(QDir::homePath());
     fsm->setResolveSymlinks(true);
-
-    //engine.setProperty("fileSystemModel", fsm);
 
     auto root = engine.rootContext();
     root->setContextProperty("fileSystemModel", fsm);
     root->setContextProperty("rootPathIndex", fsm->index(fsm->rootPath()));
+    root->setContextProperty("fileHandler", &fileHandler);
 
     qmlRegisterUncreatableType<DirectoryView>("local.DirectoryView", 1, 0,
                                                    "DirectoryView", "Cannot create a DirectoryView instance.");
